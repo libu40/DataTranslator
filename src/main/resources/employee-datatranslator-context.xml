@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:util="http://www.springframework.org/schema/util" xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/batch
+       http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+  <import resource="batch-config.xml"/>
+
+  <bean id="employeeMultiSourcesReader" class="com.assetcontrol.datatranslator.reader.EmployeeMultiSourceReader">
+    <property name="delegates" ref="multiResourcesDelegateList"/>
+  </bean>
+
+  <util:list id="multiResourcesDelegateList" value-type="org.springframework.batch.item.ItemStreamReader">
+    <ref bean="employeeReader"/>
+  </util:list>
+
+  <!-- ItemReader reads a complete line one by one from input file employee.txt -->
+  <bean id="employeeReader" class="org.springframework.batch.item.file.FlatFileItemReader"
+        scope="step">
+    <property name="linesToSkip" value="1"/>
+    <property name="lineMapper">
+      <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+        <property name="lineTokenizer">
+          <bean
+              class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+            <property name="delimiter">
+              <util:constant
+                  static-field="org.springframework.batch.item.file.transform.DelimitedLineTokenizer.DELIMITER_TAB"/>
+            </property>
+            <property name="names" value="Id,FirstName,LastName,Address,City,PhoneNumber,Email,Department"/>
+          </bean>
+        </property>
+        <property name="fieldSetMapper">
+          <!-- Mapper which maps each individual items in a record to properties in POJO -->
+          <bean class="com.assetcontrol.datatranslator.mapper.EmployeeResultSetMapper"/>
+        </property>
+      </bean>
+    </property>
+    <property name="resource" value="classpath:EmployeeInput.txt"/>
+  </bean>
+
+  <bean id="employeeDataProcessor" class="com.assetcontrol.datatranslator.processor.EmployeeDataProcessor"/>
+
+  <bean id="employeeDataWriter" class="org.springframework.batch.item.file.FlatFileItemWriter"
+        scope="step">
+    <property name="resource" value="classpath:EmployeeOutput.txt"/>
+    <property name="lineAggregator">
+      <bean
+          class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+        <property name="delimiter">
+          <util:constant
+              static-field="org.springframework.batch.item.file.transform.DelimitedLineTokenizer.DELIMITER_COMMA"/>
+        </property>
+        <property name="fieldExtractor">
+          <bean
+              class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+            <property name="names" value="name,credit"/>
+          </bean>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+  <!-- Actual Job -->
+  <batch:job id="employeeDataTranslatorJob">
+    <batch:step id="employeeDataTranslatorProcessing">
+      <batch:tasklet transaction-manager="transactionManager">
+        <batch:chunk reader="employeeMultiSourcesReader" processor="employeeDataProcessor" writer="employeeDataWriter" commit-interval="10"/>
+      </batch:tasklet>
+    </batch:step>
+    <batch:listeners>
+      <batch:listener ref="jobListener"/>
+    </batch:listeners>
+  </batch:job>
+
+
+</beans>

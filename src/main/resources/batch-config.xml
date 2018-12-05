@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+  <!-- JobRepository and JobLauncher are configuration/setup classes -->
+  <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
+
+  <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+    <property name="jobRepository" ref="jobRepository"/>
+  </bean>
+
+  <!-- Optional JobExecutionListener to perform business logic before and after the job -->
+  <bean id="jobListener" class="com.assetcontrol.datatranslator.listener.EmployeeJobListener"/>
+
+  <!-- Step will need a transaction manager -->
+  <bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+</beans>

@@ -1,0 +1,5 @@
+Id	EmployeeId
+FirstName	EmployeeFirstName
+LastName	EmployeeLastName
+Email	EmployeeEmail
+Department	EmployeeDepartment
