@@ -45,25 +45,7 @@
 
   <bean id="employeeDataProcessor" class="com.assetcontrol.datatranslator.processor.EmployeeDataProcessor"/>
 
-  <bean id="employeeDataWriter" class="org.springframework.batch.item.file.FlatFileItemWriter"
-        scope="step">
-    <property name="resource" value="classpath:EmployeeOutput.txt"/>
-    <property name="lineAggregator">
-      <bean
-          class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
-        <property name="delimiter">
-          <util:constant
-              static-field="org.springframework.batch.item.file.transform.DelimitedLineTokenizer.DELIMITER_COMMA"/>
-        </property>
-        <property name="fieldExtractor">
-          <bean
-              class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
-            <property name="names" value="name,credit"/>
-          </bean>
-        </property>
-      </bean>
-    </property>
-  </bean>
+  <bean id="employeeDataWriter" class="com.assetcontrol.datatranslator.writer.EmployeeDataWriter"/>
 
   <!-- Actual Job -->
   <batch:job id="employeeDataTranslatorJob">

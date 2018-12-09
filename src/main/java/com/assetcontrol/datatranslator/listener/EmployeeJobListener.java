@@ -3,13 +3,21 @@ package com.assetcontrol.datatranslator.listener;
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 
+/**
+ * The listener class which depicts the status and execution time of job.
+ */
 public class EmployeeJobListener implements JobExecutionListener {
 
-  private DateTime startTime, stopTime;
+  private static final Logger logger = LoggerFactory.getLogger(EmployeeJobListener.class);
+
+  private DateTime startTime;
+  private DateTime stopTime;
 
   @Override
   public void beforeJob(final JobExecution jobExecution) {
@@ -21,10 +29,10 @@ public class EmployeeJobListener implements JobExecutionListener {
     stopTime = new DateTime();
 
     if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
-      //Here you can perform some other business logic like cleanup
     } else if (jobExecution.getStatus() == BatchStatus.FAILED) {
       List<Throwable> exceptionList = jobExecution.getAllFailureExceptions();
       for (Throwable th : exceptionList) {
+        logger.warn("The exception thrown after completing the job is",th.getMessage());
       }
     }
   }

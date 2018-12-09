@@ -1,50 +1,54 @@
 package com.assetcontrol.datatranslator.reader;
 
+import java.util.List;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.ItemStreamReader;
 
-import java.util.List;
-
+/**
+ * This is the reader class which is used to read the file.
+ */
 public class EmployeeMultiSourceReader implements ItemReader, ItemStream {
 
   private List<ItemStreamReader> delegates;
   private int currentSource = 0;
 
+  /**
+   * This method is used to read the data from the input file and send to processor
+   * @return employee
+   * @throws Exception
+   */
   @Override
-  public Object read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+  public Object read() throws Exception {
     while (currentSource < delegates.size()) {
       ItemStreamReader itemStreamReader = delegates.get(currentSource);
-      Object obj = itemStreamReader.read();
-      if (obj == null) {
+      Object employee = itemStreamReader.read();
+      if (employee == null) {
         delegates.get(currentSource).close();
         currentSource++;
       } else {
-        return obj;
+        return employee;
       }
     }
     return null;
   }
 
   @Override
-  public void open(final ExecutionContext executionContext) throws ItemStreamException {
+  public void open(final ExecutionContext executionContext) {
     for (ItemStreamReader reader : delegates) {
       reader.open(executionContext);
     }
   }
 
   @Override
-  public void update(final ExecutionContext executionContext) throws ItemStreamException {
+  public void update(final ExecutionContext executionContext) {
 
   }
 
   @Override
-  public void close() throws ItemStreamException {
+  public void close() {
 
   }
 

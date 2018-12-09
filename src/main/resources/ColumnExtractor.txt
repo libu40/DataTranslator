@@ -1,5 +1,5 @@
-Id	EmployeeId
-FirstName	EmployeeFirstName
-LastName	EmployeeLastName
-Email	EmployeeEmail
-Department	EmployeeDepartment
+Id	EId
+FirstName	EFirstName
+LastName	ELastName
+Email	EEmail
+Department	EDepartment

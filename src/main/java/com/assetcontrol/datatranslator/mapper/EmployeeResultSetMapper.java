@@ -6,8 +6,16 @@ import org.springframework.validation.BindException;
 
 import com.assetcontrol.datatranslator.model.Employee;
 
+/**
+ * The mapper class to map the file to POJO.
+ */
 public class EmployeeResultSetMapper implements FieldSetMapper<Employee> {
-
+  /**
+   * method which maps the file records to POJO.
+   * @param fieldSet
+   * @return Employee
+   * @throws BindException
+   */
   @Override
   public Employee mapFieldSet(final FieldSet fieldSet) throws BindException {
     Employee employee = new Employee();
